@@ -1,29 +1,52 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * Paleta de colores institucionales del proyecto
+ * Colores profesionales con azul como color principal
+ * Diseñado para mantener consistencia visual en web y móvil
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Colores institucionales principales
+const primaryBlue = '#1e40af'; // Azul institucional principal
+const primaryBlueLight = '#3b82f6'; // Azul más claro para hover
+const primaryBlueDark = '#1e3a8a'; // Azul más oscuro para estados activos
+const accentBlue = '#60a5fa'; // Azul de acento
+
+const tintColorLight = primaryBlue;
+const tintColorDark = '#93c5fd';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#1f2937', // Gris oscuro para mejor legibilidad
+    background: '#ffffff', // Fondo blanco limpio
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: '#6b7280', // Gris medio para iconos
+    tabIconDefault: '#9ca3af', // Gris claro para iconos inactivos
     tabIconSelected: tintColorLight,
+    // Colores institucionales adicionales
+    primary: primaryBlue,
+    primaryLight: primaryBlueLight,
+    primaryDark: primaryBlueDark,
+    accent: accentBlue,
+    border: 'rgba(0, 0, 0, 0.08)', // Borde sutil
+    cardBackground: '#ffffff',
+    cardShadow: 'rgba(0, 0, 0, 0.05)',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#f9fafb', // Blanco suave para texto en modo oscuro
+    background: '#111827', // Gris muy oscuro
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#9ca3af',
+    tabIconDefault: '#6b7280',
     tabIconSelected: tintColorDark,
+    // Colores institucionales para modo oscuro
+    primary: primaryBlueLight,
+    primaryLight: accentBlue,
+    primaryDark: primaryBlue,
+    accent: '#93c5fd',
+    border: 'rgba(255, 255, 255, 0.1)',
+    cardBackground: '#1f2937',
+    cardShadow: 'rgba(0, 0, 0, 0.3)',
   },
 };
 
