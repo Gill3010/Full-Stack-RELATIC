@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -8,15 +8,34 @@ import { ThemedView } from '@/components/themed-view';
  * Componente de llamada a la acción (CTA)
  * Sección final para motivar al usuario a registrarse o contactar
  * Diseño con fondo degradado sutil y botones destacados
+ * Responsive: se adapta a web desktop, web móvil y apps nativas
  */
 export function CTASection() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // Breakpoint para móvil (web y nativo)
+
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[
+      styles.container,
+      {
+        paddingVertical: isMobile ? 64 : 80,
+        paddingHorizontal: isMobile ? 24 : 48,
+      },
+    ]}>
       <View style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
+        <ThemedText type="title" style={[
+          styles.title,
+          { fontSize: isMobile ? 28 : 40 },
+        ]}>
           ¿Listo para comenzar?
         </ThemedText>
-        <ThemedText style={styles.description}>
+        <ThemedText style={[
+          styles.description,
+          {
+            fontSize: isMobile ? 16 : 18,
+            lineHeight: isMobile ? 24 : 28,
+          },
+        ]}>
           Únete a nuestra comunidad y descubre todas las posibilidades que tenemos para ti.
           Regístrate ahora y obtén acceso exclusivo a nuestras herramientas y recursos.
         </ThemedText>
@@ -25,20 +44,38 @@ export function CTASection() {
           <Pressable
             style={({ pressed }) => [
               styles.primaryButton,
+              {
+                paddingHorizontal: isMobile ? 32 : 40,
+                paddingVertical: isMobile ? 16 : 18,
+              },
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Registrarse ahora">
-            <ThemedText style={styles.primaryButtonText}>Registrarse ahora</ThemedText>
+            <ThemedText style={[
+              styles.primaryButtonText,
+              { fontSize: isMobile ? 16 : 17 },
+            ]}>
+              Registrarse ahora
+            </ThemedText>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
               styles.secondaryButton,
+              {
+                paddingHorizontal: isMobile ? 32 : 40,
+                paddingVertical: isMobile ? 16 : 18,
+              },
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Contactar">
-            <ThemedText style={styles.secondaryButtonText}>Contactar</ThemedText>
+            <ThemedText style={[
+              styles.secondaryButtonText,
+              { fontSize: isMobile ? 16 : 17 },
+            ]}>
+              Contactar
+            </ThemedText>
           </Pressable>
         </View>
       </View>
@@ -48,14 +85,6 @@ export function CTASection() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: Platform.select({
-      web: 80,
-      default: 64,
-    }),
-    paddingHorizontal: Platform.select({
-      web: 48,
-      default: 24,
-    }),
     backgroundColor: '#f9fafb',
     // Degradado sutil usando un overlay
     position: 'relative',
@@ -68,23 +97,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   title: {
-    fontSize: Platform.select({
-      web: 40,
-      default: 28,
-    }),
     fontWeight: '700',
     color: '#1f2937',
     textAlign: 'center',
   },
   description: {
-    fontSize: Platform.select({
-      web: 18,
-      default: 16,
-    }),
-    lineHeight: Platform.select({
-      web: 28,
-      default: 24,
-    }),
     color: '#6b7280',
     textAlign: 'center',
   },
@@ -97,14 +114,6 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#1e40af',
-    paddingHorizontal: Platform.select({
-      web: 40,
-      default: 32,
-    }),
-    paddingVertical: Platform.select({
-      web: 18,
-      default: 16,
-    }),
     borderRadius: 10,
     ...Platform.select({
       web: {
@@ -117,14 +126,6 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    paddingHorizontal: Platform.select({
-      web: 40,
-      default: 32,
-    }),
-    paddingVertical: Platform.select({
-      web: 18,
-      default: 16,
-    }),
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#1e40af',
@@ -135,19 +136,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#ffffff',
-    fontSize: Platform.select({
-      web: 17,
-      default: 16,
-    }),
     fontWeight: '600',
     textAlign: 'center',
   },
   secondaryButtonText: {
     color: '#1e40af',
-    fontSize: Platform.select({
-      web: 17,
-      default: 16,
-    }),
     fontWeight: '600',
     textAlign: 'center',
   },

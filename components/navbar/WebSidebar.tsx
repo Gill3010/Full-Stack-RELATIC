@@ -34,12 +34,13 @@ interface WebSidebarProps {
  * - Muestra overlay oscuro cuando está expandido
  */
 export function WebSidebar({ onItemPress, activeItem }: WebSidebarProps) {
+  // Hook debe llamarse siempre (el hook maneja el caso cuando no está en web)
+  const { isExpanded, setIsExpanded, sidebarWidth } = useSidebar();
+  
   // Solo renderizar en web
   if (Platform.OS !== 'web') {
     return null;
   }
-
-  const { isExpanded, setIsExpanded, sidebarWidth } = useSidebar();
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -70,18 +71,19 @@ export function WebSidebar({ onItemPress, activeItem }: WebSidebarProps) {
 
       {/* Sidebar lateral - siempre visible */}
       <ThemedView
-        // @ts-ignore - React Native Web soporta position fixed
+        // @ts-ignore - React Native Web soporta position fixed, calc() y estilos CSS
         style={[
           styles.sidebar,
           {
             position: 'fixed',
-            top: 0,
+            top: 80, // Espacio para el TopNavbar (altura aproximada)
             left: 0,
-            height: '100vh',
+            // @ts-ignore - React Native Web soporta calc() en height
+            height: 'calc(100vh - 80px)', // Altura menos el TopNavbar
             width: sidebarWidth,
             zIndex: 1000,
             transition: 'width 0.3s ease-in-out',
-          },
+          } as any,
         ]}>
         {/* Header del sidebar con logo/hamburguesa */}
         <Pressable
@@ -123,6 +125,7 @@ export function WebSidebar({ onItemPress, activeItem }: WebSidebarProps) {
 const styles = StyleSheet.create({
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // @ts-ignore - React Native Web soporta transition CSS
     transition: 'opacity 0.3s ease-in-out',
   },
   sidebar: {

@@ -1,5 +1,6 @@
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
+import { Footer } from '@/components/Footer';
 import {
   AboutSection,
   CTASection,
@@ -8,6 +9,7 @@ import {
 } from '@/components/landing';
 import { MainHeader } from '@/components/main-header';
 import { useSidebar } from '@/components/navbar/SidebarContext';
+import { TopNavbar } from '@/components/navbar/TopNavbar';
 import { ThemedView } from '@/components/themed-view';
 
 /**
@@ -27,11 +29,15 @@ import { ThemedView } from '@/components/themed-view';
  */
 export default function HomeScreen() {
   const { sidebarWidth } = useSidebar();
+  const { width } = useWindowDimensions();
+  const isDesktopWeb = Platform.OS === 'web' && width >= 768;
 
-  const contentWrapperStyle = Platform.OS === 'web' 
+  // Solo aplicar marginLeft y marginTop en web desktop, no en web móvil
+  const contentWrapperStyle = isDesktopWeb
     ? {
         ...styles.contentWrapper,
         marginLeft: sidebarWidth,
+        marginTop: 80, // Espacio para el TopNavbar
         // @ts-ignore - React Native Web soporta transition CSS
         transition: 'margin-left 0.3s ease-in-out',
       }
@@ -39,6 +45,9 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.screen}>
+      {/* TopNavbar solo visible en web desktop */}
+      <TopNavbar />
+
       <MainHeader />
 
       {/* Wrapper para el push layout en web */}
@@ -51,6 +60,7 @@ export default function HomeScreen() {
           <ServicesSection />
           <AboutSection />
           <CTASection />
+          <Footer />
         </ScrollView>
       </View>
     </ThemedView>

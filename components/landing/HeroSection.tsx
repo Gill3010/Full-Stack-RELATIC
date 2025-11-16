@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,18 +9,53 @@ import { ThemedView } from '@/components/themed-view';
  * Componente de la sección Hero (principal)
  * Primera impresión visual de la landing page
  * Incluye título, subtítulo, descripción y CTA
+ * Responsive: se adapta a web desktop, web móvil y apps nativas
  */
 export function HeroSection() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // Breakpoint para móvil (web y nativo)
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
+    <ThemedView style={[
+      styles.container,
+      {
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? 32 : 48,
+        paddingVertical: isMobile ? 40 : 64,
+        paddingHorizontal: isMobile ? 24 : 48,
+      },
+    ]}>
+      <View style={[
+        styles.content,
+        {
+          flex: isMobile ? undefined : 1,
+          maxWidth: isMobile ? '100%' : 600,
+        },
+      ]}>
+        <ThemedText type="title" style={[
+          styles.title,
+          {
+            fontSize: isMobile ? 32 : 48,
+            lineHeight: isMobile ? 40 : 56,
+          },
+        ]}>
           Bienvenido a tu experiencia híbrida
         </ThemedText>
-        <ThemedText style={styles.subtitle}>
+        <ThemedText style={[
+          styles.subtitle,
+          {
+            fontSize: isMobile ? 18 : 20,
+            lineHeight: isMobile ? 26 : 28,
+          },
+        ]}>
           En la web se siente como una página, en el móvil se siente como una app nativa.
         </ThemedText>
-        <ThemedText style={styles.description}>
+        <ThemedText style={[
+          styles.description,
+          {
+            fontSize: isMobile ? 16 : 18,
+            lineHeight: isMobile ? 24 : 28,
+          },
+        ]}>
           Ofrecemos soluciones innovadoras que se adaptan perfectamente a cualquier dispositivo,
           brindando una experiencia de usuario excepcional en todas las plataformas.
         </ThemedText>
@@ -29,26 +64,50 @@ export function HeroSection() {
           <Pressable
             style={({ pressed }) => [
               styles.primaryButton,
+              {
+                paddingHorizontal: isMobile ? 24 : 32,
+                paddingVertical: isMobile ? 14 : 16,
+              },
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Comenzar ahora">
-            <ThemedText style={styles.primaryButtonText}>Comenzar ahora</ThemedText>
+            <ThemedText style={[
+              styles.primaryButtonText,
+              { fontSize: isMobile ? 15 : 16 },
+            ]}>
+              Comenzar ahora
+            </ThemedText>
           </Pressable>
           <Pressable
             style={({ pressed }) => [
               styles.secondaryButton,
+              {
+                paddingHorizontal: isMobile ? 24 : 32,
+                paddingVertical: isMobile ? 14 : 16,
+              },
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Saber más">
-            <ThemedText style={styles.secondaryButtonText}>Saber más</ThemedText>
+            <ThemedText style={[
+              styles.secondaryButtonText,
+              { fontSize: isMobile ? 15 : 16 },
+            ]}>
+              Saber más
+            </ThemedText>
           </Pressable>
         </View>
       </View>
 
       {/* Imagen de referencia - será reemplazada */}
-      <View style={styles.imageContainer}>
+      <View style={[
+        styles.imageContainer,
+        {
+          flex: isMobile ? undefined : 1,
+          height: isMobile ? 250 : 400,
+        },
+      ]}>
         <Image
           source={{ uri: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop' }}
           style={styles.heroImage}
@@ -63,70 +122,22 @@ export function HeroSection() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: Platform.select({
-      web: 'row',
-      default: 'column',
-    }),
     alignItems: 'center',
-    gap: Platform.select({
-      web: 48,
-      default: 32,
-    }),
-    paddingVertical: Platform.select({
-      web: 64,
-      default: 40,
-    }),
-    paddingHorizontal: Platform.select({
-      web: 48,
-      default: 24,
-    }),
     backgroundColor: '#ffffff',
   },
   content: {
-    flex: Platform.select({
-      web: 1,
-      default: undefined,
-    }),
     gap: 20,
-    maxWidth: Platform.select({
-      web: 600,
-      default: '100%',
-    }),
   },
   title: {
-    fontSize: Platform.select({
-      web: 48,
-      default: 32,
-    }),
     fontWeight: '700',
-    lineHeight: Platform.select({
-      web: 56,
-      default: 40,
-    }),
     color: '#1f2937',
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: Platform.select({
-      web: 20,
-      default: 18,
-    }),
     fontWeight: '600',
     color: '#1e40af',
-    lineHeight: Platform.select({
-      web: 28,
-      default: 26,
-    }),
   },
   description: {
-    fontSize: Platform.select({
-      web: 18,
-      default: 16,
-    }),
-    lineHeight: Platform.select({
-      web: 28,
-      default: 24,
-    }),
     color: '#6b7280',
     marginTop: 8,
   },
@@ -138,14 +149,6 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#1e40af',
-    paddingHorizontal: Platform.select({
-      web: 32,
-      default: 24,
-    }),
-    paddingVertical: Platform.select({
-      web: 16,
-      default: 14,
-    }),
     borderRadius: 8,
     ...Platform.select({
       web: {
@@ -158,14 +161,6 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    paddingHorizontal: Platform.select({
-      web: 32,
-      default: 24,
-    }),
-    paddingVertical: Platform.select({
-      web: 16,
-      default: 14,
-    }),
     borderRadius: 8,
     borderWidth: 2,
     borderColor: '#1e40af',
@@ -176,35 +171,16 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#ffffff',
-    fontSize: Platform.select({
-      web: 16,
-      default: 15,
-    }),
     fontWeight: '600',
     textAlign: 'center',
   },
   secondaryButtonText: {
     color: '#1e40af',
-    fontSize: Platform.select({
-      web: 16,
-      default: 15,
-    }),
     fontWeight: '600',
     textAlign: 'center',
   },
   imageContainer: {
-    flex: Platform.select({
-      web: 1,
-      default: undefined,
-    }),
-    width: Platform.select({
-      web: '100%',
-      default: '100%',
-    }),
-    height: Platform.select({
-      web: 400,
-      default: 250,
-    }),
+    width: '100%',
     borderRadius: 16,
     overflow: 'hidden',
     ...Platform.select({

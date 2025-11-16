@@ -10,4 +10,6 @@ export { MobileSidebar } from './MobileSidebar';
 export { NavItem } from './NavItem';
 export { NavLogo } from './NavLogo';
 export { SidebarNav } from './SidebarNav';
+export { TopNavbar } from './TopNavbar';
+export { WebSidebar } from './WebSidebar';
 

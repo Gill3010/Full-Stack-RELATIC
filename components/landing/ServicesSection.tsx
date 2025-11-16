@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -34,22 +34,47 @@ const SERVICES = [
  * Componente de la sección de servicios
  * Muestra tarjetas con información de cada servicio
  * Diseño responsive con grid adaptativo
+ * Responsive: se adapta a web desktop, web móvil y apps nativas
  */
 export function ServicesSection() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // Breakpoint para móvil (web y nativo)
+
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <ThemedText type="title" style={styles.sectionTitle}>
+    <ThemedView style={[
+      styles.container,
+      {
+        paddingVertical: isMobile ? 48 : 80,
+        paddingHorizontal: isMobile ? 24 : 48,
+      },
+    ]}>
+      <View style={[
+        styles.header,
+        { marginBottom: isMobile ? 32 : 48 },
+      ]}>
+        <ThemedText type="title" style={[
+          styles.sectionTitle,
+          { fontSize: isMobile ? 28 : 40 },
+        ]}>
           Nuestros Servicios
         </ThemedText>
-        <ThemedText style={styles.sectionDescription}>
+        <ThemedText style={[
+          styles.sectionDescription,
+          { fontSize: isMobile ? 16 : 18 },
+        ]}>
           Soluciones integrales diseñadas para impulsar tu negocio
         </ThemedText>
       </View>
 
-      <View style={styles.servicesGrid}>
+      <View style={[
+        styles.servicesGrid,
+        {
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 20 : 24,
+        },
+      ]}>
         {SERVICES.map((service) => (
-          <ServiceCard key={service.id} service={service} />
+          <ServiceCard key={service.id} service={service} isMobile={isMobile} />
         ))}
       </View>
     </ThemedView>
@@ -63,16 +88,27 @@ interface ServiceCardProps {
     description: string;
     image: string;
   };
+  isMobile: boolean;
 }
 
 /**
  * Tarjeta individual de servicio
  * Componente reutilizable para cada servicio
  */
-function ServiceCard({ service }: ServiceCardProps) {
+function ServiceCard({ service, isMobile }: ServiceCardProps) {
   return (
-    <ThemedView style={styles.card}>
-      <View style={styles.imageWrapper}>
+    <ThemedView style={[
+      styles.card,
+      {
+        flex: isMobile ? undefined : 1,
+        minWidth: isMobile ? '100%' : 280,
+        maxWidth: isMobile ? '100%' : 360,
+      },
+    ]}>
+      <View style={[
+        styles.imageWrapper,
+        { height: isMobile ? 180 : 200 },
+      ]}>
         <Image
           source={{ uri: service.image }}
           style={styles.cardImage}
@@ -81,11 +117,23 @@ function ServiceCard({ service }: ServiceCardProps) {
           placeholder={{ blurhash: 'LGF5]+Yk^6#M@-5c,1J5@[or[Q6.' }}
         />
       </View>
-      <View style={styles.cardContent}>
-        <ThemedText type="subtitle" style={styles.cardTitle}>
+      <View style={[
+        styles.cardContent,
+        { padding: isMobile ? 20 : 24 },
+      ]}>
+        <ThemedText type="subtitle" style={[
+          styles.cardTitle,
+          { fontSize: isMobile ? 20 : 22 },
+        ]}>
           {service.title}
         </ThemedText>
-        <ThemedText style={styles.cardDescription}>
+        <ThemedText style={[
+          styles.cardDescription,
+          {
+            fontSize: isMobile ? 14 : 15,
+            lineHeight: isMobile ? 22 : 24,
+          },
+        ]}>
           {service.description}
         </ThemedText>
       </View>
@@ -95,67 +143,27 @@ function ServiceCard({ service }: ServiceCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: Platform.select({
-      web: 80,
-      default: 48,
-    }),
-    paddingHorizontal: Platform.select({
-      web: 48,
-      default: 24,
-    }),
     backgroundColor: '#f9fafb',
   },
   header: {
     alignItems: 'center',
-    marginBottom: Platform.select({
-      web: 48,
-      default: 32,
-    }),
     gap: 12,
   },
   sectionTitle: {
-    fontSize: Platform.select({
-      web: 40,
-      default: 28,
-    }),
     fontWeight: '700',
     color: '#1f2937',
     textAlign: 'center',
   },
   sectionDescription: {
-    fontSize: Platform.select({
-      web: 18,
-      default: 16,
-    }),
     color: '#6b7280',
     textAlign: 'center',
     maxWidth: 600,
   },
   servicesGrid: {
-    flexDirection: Platform.select({
-      web: 'row',
-      default: 'column',
-    }),
-    gap: Platform.select({
-      web: 24,
-      default: 20,
-    }),
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
   card: {
-    flex: Platform.select({
-      web: 1,
-      default: undefined,
-    }),
-    minWidth: Platform.select({
-      web: 280,
-      default: '100%',
-    }),
-    maxWidth: Platform.select({
-      web: 360,
-      default: '100%',
-    }),
     backgroundColor: '#ffffff',
     borderRadius: 16,
     overflow: 'hidden',
@@ -170,10 +178,6 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     width: '100%',
-    height: Platform.select({
-      web: 200,
-      default: 180,
-    }),
     overflow: 'hidden',
   },
   cardImage: {
@@ -181,30 +185,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cardContent: {
-    padding: Platform.select({
-      web: 24,
-      default: 20,
-    }),
     gap: 8,
   },
   cardTitle: {
-    fontSize: Platform.select({
-      web: 22,
-      default: 20,
-    }),
     fontWeight: '600',
     color: '#1f2937',
     marginBottom: 4,
   },
   cardDescription: {
-    fontSize: Platform.select({
-      web: 15,
-      default: 14,
-    }),
-    lineHeight: Platform.select({
-      web: 24,
-      default: 22,
-    }),
     color: '#6b7280',
   },
 });

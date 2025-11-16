@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -9,33 +9,70 @@ import { ThemedView } from '@/components/themed-view';
  * Componente de la sección "Sobre Nosotros"
  * Presenta la historia y valores de la empresa
  * Diseño con imagen y texto en layout responsive
+ * Responsive: se adapta a web desktop, web móvil y apps nativas
  */
 export function AboutSection() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // Breakpoint para móvil (web y nativo)
+
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.content}>
+    <ThemedView style={[
+      styles.container,
+      {
+        paddingVertical: isMobile ? 48 : 80,
+        paddingHorizontal: isMobile ? 24 : 48,
+      },
+    ]}>
+      <View style={[
+        styles.content,
+        {
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 32 : 64,
+        },
+      ]}>
         <View style={styles.textContent}>
-          <ThemedText type="title" style={styles.title}>
+          <ThemedText type="title" style={[
+            styles.title,
+            { fontSize: isMobile ? 28 : 40 },
+          ]}>
             Sobre Nosotros
           </ThemedText>
-          <ThemedText style={styles.description}>
+          <ThemedText style={[
+            styles.description,
+            {
+              fontSize: isMobile ? 16 : 18,
+              lineHeight: isMobile ? 24 : 28,
+            },
+          ]}>
             Somos un equipo apasionado por la tecnología y la innovación. Con años de experiencia
             en desarrollo de software, nos especializamos en crear soluciones que combinan lo mejor
             del mundo web y móvil.
           </ThemedText>
-          <ThemedText style={styles.description}>
+          <ThemedText style={[
+            styles.description,
+            {
+              fontSize: isMobile ? 16 : 18,
+              lineHeight: isMobile ? 24 : 28,
+            },
+          ]}>
             Nuestra misión es ayudar a empresas y emprendedores a alcanzar sus objetivos mediante
             tecnologías de vanguardia y un enfoque centrado en el usuario.
           </ThemedText>
 
-          <View style={styles.statsContainer}>
-            <StatItem number="500+" label="Proyectos" />
-            <StatItem number="200+" label="Clientes" />
-            <StatItem number="10+" label="Años" />
+          <View style={[
+            styles.statsContainer,
+            { gap: isMobile ? 32 : 48 },
+          ]}>
+            <StatItem number="500+" label="Proyectos" isMobile={isMobile} />
+            <StatItem number="200+" label="Clientes" isMobile={isMobile} />
+            <StatItem number="10+" label="Años" isMobile={isMobile} />
           </View>
         </View>
 
-        <View style={styles.imageContainer}>
+        <View style={[
+          styles.imageContainer,
+          { height: isMobile ? 300 : 500 },
+        ]}>
           <Image
             source={{ uri: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=600&fit=crop' }}
             style={styles.aboutImage}
@@ -52,43 +89,38 @@ export function AboutSection() {
 interface StatItemProps {
   number: string;
   label: string;
+  isMobile: boolean;
 }
 
 /**
  * Componente para mostrar estadísticas
  * Números destacados con etiquetas descriptivas
  */
-function StatItem({ number, label }: StatItemProps) {
+function StatItem({ number, label, isMobile }: StatItemProps) {
   return (
     <View style={styles.statItem}>
-      <ThemedText style={styles.statNumber}>{number}</ThemedText>
-      <ThemedText style={styles.statLabel}>{label}</ThemedText>
+      <ThemedText style={[
+        styles.statNumber,
+        { fontSize: isMobile ? 28 : 36 },
+      ]}>
+        {number}
+      </ThemedText>
+      <ThemedText style={[
+        styles.statLabel,
+        { fontSize: isMobile ? 14 : 16 },
+      ]}>
+        {label}
+      </ThemedText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: Platform.select({
-      web: 80,
-      default: 48,
-    }),
-    paddingHorizontal: Platform.select({
-      web: 48,
-      default: 24,
-    }),
     backgroundColor: '#ffffff',
   },
   content: {
-    flexDirection: Platform.select({
-      web: 'row',
-      default: 'column',
-    }),
     alignItems: 'center',
-    gap: Platform.select({
-      web: 64,
-      default: 32,
-    }),
     maxWidth: 1200,
     alignSelf: 'center',
     width: '100%',
@@ -98,31 +130,15 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    fontSize: Platform.select({
-      web: 40,
-      default: 28,
-    }),
     fontWeight: '700',
     color: '#1f2937',
     marginBottom: 8,
   },
   description: {
-    fontSize: Platform.select({
-      web: 18,
-      default: 16,
-    }),
-    lineHeight: Platform.select({
-      web: 28,
-      default: 24,
-    }),
     color: '#6b7280',
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: Platform.select({
-      web: 48,
-      default: 32,
-    }),
     marginTop: 16,
     flexWrap: 'wrap',
   },
@@ -131,28 +147,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statNumber: {
-    fontSize: Platform.select({
-      web: 36,
-      default: 28,
-    }),
     fontWeight: '700',
     color: '#1e40af',
   },
   statLabel: {
-    fontSize: Platform.select({
-      web: 16,
-      default: 14,
-    }),
     color: '#6b7280',
     fontWeight: '500',
   },
   imageContainer: {
     flex: 1,
     width: '100%',
-    height: Platform.select({
-      web: 500,
-      default: 300,
-    }),
     borderRadius: 16,
     overflow: 'hidden',
     ...Platform.select({
