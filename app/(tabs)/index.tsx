@@ -1,8 +1,10 @@
+import React, { useRef } from 'react';
 import { Platform, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { Footer } from '@/components/Footer';
 import {
   AboutSection,
+  BenefitsSection,
   CTASection,
   HeroSection,
   ServicesSection,
@@ -31,6 +33,8 @@ export default function HomeScreen() {
   const { sidebarWidth } = useSidebar();
   const { width } = useWindowDimensions();
   const isDesktopWeb = Platform.OS === 'web' && width >= 768;
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [scrollY, setScrollY] = React.useState(0);
 
   // Solo aplicar marginLeft y marginTop en web desktop, no en web móvil
   const contentWrapperStyle = isDesktopWeb
@@ -43,21 +47,30 @@ export default function HomeScreen() {
       }
     : styles.contentWrapper;
 
+  const handleScroll = (event: any) => {
+    const offsetY = event.nativeEvent?.contentOffset?.y || 0;
+    setScrollY(offsetY);
+  };
+
   return (
     <ThemedView style={styles.screen}>
       {/* TopNavbar solo visible en web desktop */}
-      <TopNavbar />
+      <TopNavbar scrollY={scrollY} />
 
       <MainHeader />
 
       {/* Wrapper para el push layout en web */}
       <View style={contentWrapperStyle}>
         <ScrollView
+          ref={scrollViewRef}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           style={styles.scrollView}>
           <HeroSection />
           <ServicesSection />
+          <BenefitsSection />
           <AboutSection />
           <CTASection />
           <Footer />

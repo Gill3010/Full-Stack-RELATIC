@@ -95,9 +95,9 @@ export function WebSidebar({ onItemPress, activeItem }: WebSidebarProps) {
             {isExpanded ? (
               <>
                 <ThemedText type="title" style={styles.logo}>
-                  MiProyecto
+                  Menú
                 </ThemedText>
-                <MaterialIcons name="menu" size={24} color="#1f2937" />
+                <MaterialIcons name="close" size={24} color="#1f2937" />
               </>
             ) : (
               <MaterialIcons name="menu" size={28} color="#1e40af" />

@@ -21,8 +21,26 @@ export function Footer() {
     Linking.openURL(url).catch((err) => console.error('Error al abrir enlace:', err));
   };
 
+  // Componente wrapper para el degradado en web
+  const GradientContainer = ({ children, style }: { children: React.ReactNode; style?: any }) => {
+    if (Platform.OS === 'web') {
+      const mergedStyle = Array.isArray(style)
+        ? Object.assign({}, ...style.filter(s => s))
+        : style || {};
+      
+      return React.createElement('div', {
+        style: {
+          background: 'linear-gradient(180deg, #000000 0%, #1a1a1a 100%)',
+          width: '100%',
+          ...mergedStyle,
+        },
+      }, children);
+    }
+    return <ThemedView style={[{ backgroundColor: '#000000' }, style]}>{children}</ThemedView>;
+  };
+
   return (
-    <ThemedView style={[styles.container, { backgroundColor: '#1e40af' }]}>
+    <GradientContainer style={styles.container}>
       <View style={[styles.content, { paddingHorizontal: isMobile ? 24 : 48, paddingVertical: isMobile ? 40 : 60 }]}>
         {/* Grid principal con todas las secciones en columnas */}
         <View style={[styles.mainGrid, { flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 32 : 40 }]}>
@@ -94,39 +112,51 @@ export function Footer() {
             <View style={styles.socialContainer}>
               <Pressable
                 onPress={() => handleLinkPress('https://www.linkedin.com/company/relatic-panama')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="LinkedIn">
-                <LinkedInIcon />
+                <View style={styles.socialIconCircle}>
+                  <LinkedInIcon />
+                </View>
               </Pressable>
               <Pressable
                 onPress={() => handleLinkPress('https://www.instagram.com/relaticpanama')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="Instagram">
-                <InstagramIcon />
+                <View style={styles.socialIconCircle}>
+                  <InstagramIcon />
+                </View>
               </Pressable>
               <Pressable
                 onPress={() => handleLinkPress('https://x.com/relaticpanama')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="X (Twitter)">
-                <XIcon />
+                <View style={styles.socialIconCircle}>
+                  <XIcon />
+                </View>
               </Pressable>
               <Pressable
                 onPress={() => handleLinkPress('https://www.facebook.com/relaticpanama')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="Facebook">
-                <FacebookIcon />
+                <View style={styles.socialIconCircle}>
+                  <FacebookIcon />
+                </View>
               </Pressable>
               <Pressable
                 onPress={() => handleLinkPress('https://www.youtube.com/@relaticpanama')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="YouTube">
-                <YouTubeIcon />
+                <View style={styles.socialIconCircle}>
+                  <YouTubeIcon />
+                </View>
               </Pressable>
               <Pressable
                 onPress={() => handleLinkPress('https://wa.me/50766457685')}
-                style={styles.socialIcon}
+                style={styles.socialIconWrapper}
                 accessibilityLabel="WhatsApp">
-                <WhatsAppIcon />
+                <View style={styles.socialIconCircle}>
+                  <WhatsAppIcon />
+                </View>
               </Pressable>
             </View>
           </View>
@@ -149,7 +179,7 @@ export function Footer() {
           <ThemedText style={styles.innovaText}>Innova Proyectos</ThemedText>
         </ThemedText>
       </View>
-    </ThemedView>
+    </GradientContainer>
   );
 }
 
@@ -165,6 +195,7 @@ const SocialIcon = ({ svgContent, testID }: { svgContent: string; testID?: strin
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        flexShrink: 0,
       },
       'data-testid': testID,
     });
@@ -217,9 +248,10 @@ const WhatsAppIcon = () => (
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    backgroundColor: '#000000',
     ...Platform.select({
       web: {
-        boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.3)',
       },
     }),
   },
@@ -239,20 +271,20 @@ const styles = StyleSheet.create({
   mainTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#3b82f6',
+    color: '#ffffff',
     marginBottom: 12,
     letterSpacing: 0.5,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#3b82f6',
+    color: '#ffffff',
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
     lineHeight: 22,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#b0b0b0',
   },
   linkList: {
     gap: 12,
@@ -262,11 +294,12 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: '#b0b0b0',
     ...Platform.select({
       web: {
         cursor: 'pointer',
         textDecorationLine: 'none',
+        transition: 'color 0.2s ease',
         ':hover': {
           color: '#ffffff',
         },
@@ -282,33 +315,56 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: '#b0b0b0',
     ...Platform.select({
       web: {
         cursor: 'pointer',
+        transition: 'color 0.2s ease',
+        ':hover': {
+          color: '#ffffff',
+        },
       },
     }),
   },
   socialContainer: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
     marginTop: 8,
+    flexWrap: 'wrap',
   },
-  socialIcon: {
-    padding: 4,
+  socialIconWrapper: {
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'transform 0.2s',
+      },
+    }),
+  },
+  socialIconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(255, 255, 255, 0.1)',
+        transition: 'all 0.3s ease',
+        display: 'flex',
         ':hover': {
-          transform: 'scale(1.1)',
+          backgroundColor: '#f3f4f6',
+          transform: 'scale(1.15)',
+          boxShadow: '0 4px 12px rgba(255, 255, 255, 0.2)',
         },
+      },
+      default: {
+        elevation: 2,
       },
     }),
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     width: '100%',
   },
   bottomFooter: {
@@ -318,18 +374,18 @@ const styles = StyleSheet.create({
   },
   copyrightText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#b0b0b0',
     textAlign: 'center',
   },
   poweredByText: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#b0b0b0',
     textAlign: 'center',
   },
   innovaText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
+    color: '#ffffff',
   },
 });
 

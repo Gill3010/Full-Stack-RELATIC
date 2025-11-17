@@ -4,6 +4,7 @@
  */
 
 export { AboutSection } from './AboutSection';
+export { BenefitsSection } from './BenefitsSection';
 export { CTASection } from './CTASection';
 export { HeroSection } from './HeroSection';
 export { ServicesSection } from './ServicesSection';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -8,6 +8,8 @@ interface TopNavbarProps {
   onLoginPress?: () => void;
   /** Función que se ejecuta al presionar "Regístrate" */
   onRegisterPress?: () => void;
+  /** Posición Y del scroll (opcional, se detecta automáticamente si no se proporciona) */
+  scrollY?: number;
 }
 
 /**
@@ -16,9 +18,67 @@ interface TopNavbarProps {
  * Solo se muestra en web desktop (>= 768px)
  * Fondo azul institucional (#1e40af)
  */
-export function TopNavbar({ onLoginPress, onRegisterPress }: TopNavbarProps) {
+export function TopNavbar({ onLoginPress, onRegisterPress, scrollY }: TopNavbarProps) {
   const { width } = useWindowDimensions();
   const isDesktopWeb = Platform.OS === 'web' && width >= 768;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Detectar scroll - usar scrollY prop si está disponible, sino detectar automáticamente
+  // IMPORTANTE: Este hook debe ejecutarse siempre, antes de cualquier return condicional
+  useEffect(() => {
+    // Solo procesar si es web desktop
+    if (!isDesktopWeb) {
+      return;
+    }
+
+    // Si se proporciona scrollY como prop, usarlo directamente
+    if (scrollY !== undefined) {
+      setIsScrolled(scrollY > 50);
+      return;
+    }
+
+    // Si no se proporciona, detectar automáticamente (solo en web)
+    if (Platform.OS !== 'web') {
+      return;
+    }
+
+    const handleScroll = () => {
+      let currentScrollY = 0;
+      
+      if (typeof window !== 'undefined') {
+        currentScrollY = window.scrollY || window.pageYOffset || 0;
+      }
+      
+      if (currentScrollY === 0 && typeof document !== 'undefined') {
+        currentScrollY = document.documentElement?.scrollTop || 
+                        document.body?.scrollTop || 
+                        0;
+      }
+
+      setIsScrolled(currentScrollY > 50);
+    };
+
+    // Agregar listeners
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+    
+    if (typeof document !== 'undefined') {
+      document.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    // Verificar estado inicial
+    handleScroll();
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('scroll', handleScroll);
+      }
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [scrollY, isDesktopWeb]);
 
   // Solo renderizar en web desktop
   if (!isDesktopWeb) {
@@ -43,6 +103,12 @@ export function TopNavbar({ onLoginPress, onRegisterPress }: TopNavbarProps) {
     }
   };
 
+  // Colores según el estado
+  const backgroundColor = isScrolled ? '#ffffff' : '#1e40af';
+  const borderBottomColor = isScrolled ? '#1e40af' : '#ffffff';
+  const titleColor = isScrolled ? '#1f2937' : '#ffffff';
+  const subtitleColor = isScrolled ? '#6b7280' : 'rgba(255, 255, 255, 0.9)';
+
   return (
     <View
       // @ts-ignore - React Native Web soporta position fixed
@@ -54,13 +120,23 @@ export function TopNavbar({ onLoginPress, onRegisterPress }: TopNavbarProps) {
           left: 0,
           right: 0,
           zIndex: 1001,
+          backgroundColor,
+          borderBottomWidth: 1,
+          borderBottomColor,
+          ...Platform.select({
+            web: {
+              transition: 'background-color 0.3s ease, border-bottom-color 0.3s ease',
+            },
+          }),
         },
       ]}>
       <View style={styles.content}>
         {/* Sección izquierda: Logo y subtítulo */}
         <View style={styles.leftSection}>
-          <ThemedText style={styles.title}>RELATIC PANAMA</ThemedText>
-          <ThemedText style={styles.subtitle}>
+          <ThemedText style={[styles.title, { color: titleColor }]}>
+            RELATIC PANAMA
+          </ThemedText>
+          <ThemedText style={[styles.subtitle, { color: subtitleColor }]}>
             red latinoamericana de investigaciones cualitativas
           </ThemedText>
         </View>
@@ -71,22 +147,34 @@ export function TopNavbar({ onLoginPress, onRegisterPress }: TopNavbarProps) {
             onPress={handleLogin}
             style={({ pressed }) => [
               styles.loginButton,
+              isScrolled && styles.loginButtonScrolled,
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Iniciar sesión">
-            <ThemedText style={styles.loginButtonText}>Iniciar sesión</ThemedText>
+            <ThemedText style={[
+              styles.loginButtonText,
+              isScrolled && styles.loginButtonTextScrolled,
+            ]}>
+              Iniciar sesión
+            </ThemedText>
           </Pressable>
 
           <Pressable
             onPress={handleRegister}
             style={({ pressed }) => [
               styles.registerButton,
+              isScrolled && styles.registerButtonScrolled,
               pressed && styles.buttonPressed,
             ]}
             accessibilityRole="button"
             accessibilityLabel="Regístrate">
-            <ThemedText style={styles.registerButtonText}>Regístrate</ThemedText>
+            <ThemedText style={[
+              styles.registerButtonText,
+              isScrolled && styles.registerButtonTextScrolled,
+            ]}>
+              Regístrate
+            </ThemedText>
           </Pressable>
         </View>
       </View>
@@ -96,11 +184,17 @@ export function TopNavbar({ onLoginPress, onRegisterPress }: TopNavbarProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1e40af',
     width: '100%',
     paddingVertical: 12,
     paddingHorizontal: 48,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        elevation: 2,
+      },
+    }),
   },
   content: {
     flexDirection: 'row',
@@ -139,6 +233,21 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ffffff',
     backgroundColor: 'transparent',
+    ...Platform.select({
+      web: {
+        transition: 'all 0.3s ease',
+      },
+    }),
+  },
+  loginButtonScrolled: {
+    borderColor: '#1e40af',
+    ...Platform.select({
+      web: {
+        ':hover': {
+          backgroundColor: '#f3f4f6',
+        },
+      },
+    }),
   },
   registerButton: {
     paddingHorizontal: 24,
@@ -148,9 +257,21 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease',
       },
       default: {
         elevation: 2,
+      },
+    }),
+  },
+  registerButtonScrolled: {
+    backgroundColor: '#1e40af',
+    ...Platform.select({
+      web: {
+        boxShadow: '0 2px 4px rgba(30, 64, 175, 0.3)',
+        ':hover': {
+          backgroundColor: '#1e3a8a',
+        },
       },
     }),
   },
@@ -163,12 +284,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#ffffff',
     textAlign: 'center',
+    ...Platform.select({
+      web: {
+        transition: 'color 0.3s ease',
+      },
+    }),
+  },
+  loginButtonTextScrolled: {
+    color: '#1e40af',
   },
   registerButtonText: {
     fontSize: 15,
     fontWeight: '600',
     color: '#1e40af',
     textAlign: 'center',
+    ...Platform.select({
+      web: {
+        transition: 'color 0.3s ease',
+      },
+    }),
+  },
+  registerButtonTextScrolled: {
+    color: '#ffffff',
   },
 });
 
